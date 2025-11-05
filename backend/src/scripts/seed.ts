@@ -19,6 +19,7 @@ import {
   linkSalesChannelsToStockLocationWorkflow,
   updateStoresWorkflow,
 } from "@medusajs/medusa/core-flows";
+import seedMetaDefinitions from "./seed-meta-definitions";
 
 export default async function seedDemoData({ container }: ExecArgs) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
@@ -315,6 +316,10 @@ export default async function seedDemoData({ container }: ExecArgs) {
   });
   logger.info("Finished seeding publishable API key data.");
 
+  logger.info("Seeding meta field definitions...");
+  await seedMetaDefinitions(container);
+  logger.info("Finished seeding meta field definitions.");
+
   logger.info("Seeding product data...");
 
   const { result: categoryResult } = await createProductCategoriesWorkflow(
@@ -341,6 +346,13 @@ export default async function seedDemoData({ container }: ExecArgs) {
       ],
     },
   });
+
+  // Initialize meta defaults for all created categories
+  const metaValueService = container.resolve("metaValueService");
+  for (const category of categoryResult) {
+    await metaValueService.initDefaultsForNewCategory(category.id);
+    logger.info(`Initialized meta defaults for category: ${category.name}`);
+  }
 
   await createProductsWorkflow(container).run({
     input: {
