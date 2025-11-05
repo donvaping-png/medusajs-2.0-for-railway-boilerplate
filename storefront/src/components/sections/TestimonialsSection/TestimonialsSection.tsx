@@ -42,7 +42,7 @@ export const TestimonialsSection = () => {
                 <span key={i} className="text-action text-xl">★</span>
               ))}
             </div>
-            <p className="text-primary mb-6 italic">"{testimonial.comment}"</p>
+            <p className="text-primary mb-6 italic">&ldquo;{testimonial.comment}&rdquo;</p>
             <div className="border-t pt-4">
               <p className="font-bold">{testimonial.name}</p>
               <p className="text-sm text-secondary">{testimonial.role}</p>
