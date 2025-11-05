@@ -58,11 +58,16 @@ export const listProducts = async ({
     }
   }
 
-  const headers = {
-    ...(await getAuthHeaders()),
-  }
-
   const useCached = forceCache || (limit <= 8 && !category_id && !collection_id)
+
+  console.log('Fetching products with params:', {
+    country_code: countryCode,
+    category_id,
+    collection_id,
+    limit,
+    offset,
+    region_id: region?.id,
+  })
 
   return sdk.client
     .fetch<{
@@ -81,11 +86,11 @@ export const listProducts = async ({
           "*variants.calculated_price,+variants.inventory_quantity,*variants",
         ...queryParams,
       },
-      headers,
       next: useCached ? { revalidate: 60 } : undefined,
       cache: useCached ? "force-cache" : "no-cache",
     })
     .then(({ products: productsRaw, count }) => {
+      console.log('Products received from API:', productsRaw.length, 'count:', count)
       const nextPage = count > offset + limit ? pageParam + 1 : null
 
       return {
@@ -97,7 +102,10 @@ export const listProducts = async ({
         queryParams,
       }
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error('Error fetching products:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      
       return {
         response: {
           products: [],
@@ -137,6 +145,8 @@ export const listProductsWithSort = async ({
   nextPage: number | null
   queryParams?: HttpTypes.FindParams & HttpTypes.StoreProductParams
 }> => {
+  console.log('listProductsWithSort called with:', { category_id, collection_id, countryCode })
+  
   const limit = queryParams?.limit || 12
 
   const {
@@ -151,12 +161,35 @@ export const listProductsWithSort = async ({
     collection_id,
     countryCode,
   })
+  
+  console.log('listProductsWithSort received products:', products.length)
 
   const filteredProducts = products
 
-  const pricedProducts = filteredProducts.filter((prod) =>
-    prod.variants?.some((variant) => variant.calculated_price !== null)
-  )
+  console.log('Total products fetched:', products.length)
+  console.log('Products:', products.map(p => ({ 
+    id: p.id, 
+    title: p.title, 
+    variants: p.variants?.length,
+    variantsDetails: p.variants?.map(v => ({
+      id: v.id,
+      title: v.title,
+      calculated_price: v.calculated_price
+    }))
+  })))
+
+  const pricedProducts = filteredProducts.filter((prod) => {
+    const hasPrice = prod.variants?.some((variant) => {
+      console.log('Checking variant:', variant.id, 'calculated_price:', variant.calculated_price)
+      return variant.calculated_price !== null && variant.calculated_price !== undefined
+    })
+    if (!hasPrice) {
+      console.log('Product without price:', prod.id, prod.title, 'variants:', prod.variants)
+    }
+    return hasPrice
+  })
+
+  console.log('Products with prices:', pricedProducts.length)
 
   const sortedProducts = sortProducts(pricedProducts, sortBy)
 
