@@ -11,6 +11,13 @@ import { WishlistPage } from "./WishlistPage/WishlistPage"
 import { ProductDetailsPage } from "./ProductDetailsPage/ProductDetailsPage"
 import { AlgoliaProductsListing } from "./ProductListing/AlgoliaProductsListing"
 import { OrdersPagination } from "../organisms/OrdersPagination/OrdersPagination"
+import { CustomStickerShowcase } from "./CustomStickerShowcase"
+import { FeaturesSection } from "./FeaturesSection"
+import { ProcessSection } from "./ProcessSection"
+import { StickerCategories } from "./StickerCategories"
+import { UseCasesSection } from "./UseCasesSection"
+import { TestimonialsSection } from "./TestimonialsSection"
+import { CTASection } from "./CTASection"
 
 export {
   Hero,
@@ -26,4 +33,11 @@ export {
   ProductDetailsPage,
   AlgoliaProductsListing,
   OrdersPagination,
+  CustomStickerShowcase,
+  FeaturesSection,
+  ProcessSection,
+  StickerCategories,
+  UseCasesSection,
+  TestimonialsSection,
+  CTASection,
 }

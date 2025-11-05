@@ -1,10 +1,13 @@
 import {
-  BannerSection,
-  BlogSection,
   Hero,
-  HomeCategories,
   HomeProductSection,
-  ShopByStyleSection,
+  StickerCategories,
+  CustomStickerShowcase,
+  FeaturesSection,
+  ProcessSection,
+  UseCasesSection,
+  TestimonialsSection,
+  CTASection,
 } from "@/components/sections"
 
 import type { Metadata } from "next"
@@ -12,6 +15,7 @@ import { headers } from "next/headers"
 import Script from "next/script"
 import { listRegions } from "@/lib/data/regions"
 import { toHreflang } from "@/lib/helpers/hreflang"
+import { listProducts } from "@/lib/data/products"
 
 export async function generateMetadata({
   params,
@@ -48,9 +52,9 @@ export async function generateMetadata({
     languages = { [toHreflang(locale)]: `${baseUrl}/${locale}` }
   }
 
-  const title = "Home"
+  const title = "Pegatinas de Vinilo Personalizadas | Diseños Únicos"
   const description =
-    "Welcome to Mercur B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront."
+    "Crea pegatinas de vinilo personalizadas de alta calidad. Resistentes al agua y UV. Diseños únicos para laptops, coches, botellas y más. Envío rápido."
   const ogImage = "/B2C_Storefront_Open_Graph.png"
   const canonical = `${baseUrl}/${locale}`
 
@@ -122,6 +126,43 @@ export default async function Home({
     process.env.NEXT_PUBLIC_SITE_NAME ||
     "Mercur B2C Demo - Marketplace Storefront"
 
+  // Fetch products for the home page
+  let products: any[] = []
+  try {
+    // Try with the locale first
+    let productsData = await listProducts({
+      pageParam: 1,
+      queryParams: { limit: 8 },
+      countryCode: locale,
+      forceCache: true,
+    })
+    products = productsData.response.products
+    console.log(
+      `[HOME] Fetched ${products.length} products for locale: ${locale}`
+    )
+
+    // If no products found, try with default region
+    if (products.length === 0) {
+      const defaultRegion =
+        process.env.NEXT_PUBLIC_DEFAULT_REGION || "pl"
+      console.log(
+        `[HOME] No products for ${locale}, trying default region: ${defaultRegion}`
+      )
+      productsData = await listProducts({
+        pageParam: 1,
+        queryParams: { limit: 8 },
+        countryCode: defaultRegion,
+        forceCache: true,
+      })
+      products = productsData.response.products
+      console.log(
+        `[HOME] Fetched ${products.length} products for default region`
+      )
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error)
+  }
+
   return (
     <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start text-primary">
       <link
@@ -162,27 +203,45 @@ export default async function Home({
 
       <Hero
         image="/images/hero/Image.jpg"
-        heading="Snag your style in a flash"
-        paragraph="Buy, sell, and discover pre-loved gems from the trendiest brands."
+        heading="Pegatinas de vinilo que destacan"
+        paragraph="Diseña pegatinas personalizadas de alta calidad. Resistentes, duraderas y con acabados profesionales para cualquier superficie."
         buttons={[
-          { label: "Buy now", path: "/categories" },
+          { label: "Crear diseño", path: "/categories/custom-stickers" },
           {
-            label: "Sell now",
-            path:
-              process.env.NEXT_PUBLIC_VENDOR_URL ||
-              "https://vendor.mercurjs.com",
+            label: "Ver catálogo",
+            path: "/categories",
           },
         ]}
       />
       <div className="px-4 lg:px-8 w-full">
-        <HomeProductSection heading="trending listings" locale={locale} home />
+        <FeaturesSection />
       </div>
       <div className="px-4 lg:px-8 w-full">
-        <HomeCategories heading="SHOP BY CATEGORY" />
+        <StickerCategories heading="TIPOS DE PEGATINAS" />
       </div>
-      <BannerSection />
-      <ShopByStyleSection />
-      <BlogSection />
+      <div className="px-4 lg:px-8 w-full">
+        <CustomStickerShowcase />
+      </div>
+      <div className="px-4 lg:px-8 w-full">
+        <UseCasesSection />
+      </div>
+      <div className="px-4 lg:px-8 w-full">
+        <ProcessSection />
+      </div>
+      <div className="px-4 lg:px-8 w-full">
+        <HomeProductSection
+          heading="Diseños populares"
+          locale={locale}
+          products={products}
+          home
+        />
+      </div>
+      <div className="px-4 lg:px-8 w-full">
+        <TestimonialsSection />
+      </div>
+      <div className="px-4 lg:px-8 w-full">
+        <CTASection />
+      </div>
     </main>
   )
 }

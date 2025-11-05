@@ -14,12 +14,31 @@ export const HomeProductsCarousel = async ({
   sellerProducts: Product[]
   home: boolean
 }) => {
+  // Si es home y ya tenemos productos, usarlos directamente
+  if (home && sellerProducts.length > 0) {
+    return (
+      <div className="flex justify-center w-full">
+        <Carousel
+          align="start"
+          items={sellerProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              api_product={product as HttpTypes.StoreProduct}
+            />
+          ))}
+        />
+      </div>
+    )
+  }
+
+  // Si no es home o no hay productos, hacer la llamada
   const {
     response: { products },
   } = await listProducts({
     countryCode: locale,
     queryParams: {
-      limit: home ? 4 : undefined,
+      limit: home ? 8 : undefined,
       order: "created_at",
       handle: home
         ? undefined
