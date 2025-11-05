@@ -1,32 +1,61 @@
-import { sdk } from "@lib/config"
-import { cache } from "react"
+import { sdk } from "@/lib/config"
+import { HttpTypes } from "@medusajs/types"
 
-export const listCategories = cache(async function () {
-  return sdk.store.category
-    .list({ fields: "+category_children" }, { next: { tags: ["categories"] } })
+interface CategoriesProps {
+  query?: Record<string, any>
+  headingCategories?: string[]
+}
+
+export const listCategories = async ({
+  query,
+  headingCategories = [],
+}: Partial<CategoriesProps> = {}) => {
+  const limit = query?.limit || 100
+
+  const categories = await sdk.client
+    .fetch<{
+      product_categories: HttpTypes.StoreProductCategory[]
+    }>("/store/product-categories", {
+      query: {
+        fields: "handle, name, rank, parent_category_id",
+        limit,
+        ...query,
+      },
+      cache: "force-cache",
+      next: { revalidate: 3600 },
+    })
     .then(({ product_categories }) => product_categories)
-})
 
-export const getCategoriesList = cache(async function (
-  offset: number = 0,
-  limit: number = 100
-) {
-  return sdk.store.category.list(
-    // TODO: Look into fixing the type
-    // @ts-ignore
-    { limit, offset },
-    { next: { tags: ["categories"] } }
+  const parentCategories = categories.filter(({ name }) =>
+    headingCategories.includes(name.toLowerCase())
   )
-})
 
-export const getCategoryByHandle = cache(async function (
-  categoryHandle: string[]
-) {
-
-  return sdk.store.category.list(
-    // TODO: Look into fixing the type
-    // @ts-ignore
-    { handle: categoryHandle },
-    { next: { tags: ["categories"] } }
+  const childrenCategories = categories.filter(
+    ({ name }) => !headingCategories.includes(name.toLowerCase())
   )
-})
+
+  return {
+    categories: childrenCategories.filter(
+      ({ parent_category_id }) => !parent_category_id
+    ),
+    parentCategories: parentCategories,
+  }
+}
+
+export const getCategoryByHandle = async (categoryHandle: string[]) => {
+  const handle = `${categoryHandle.join("/")}`
+
+  return sdk.client
+    .fetch<HttpTypes.StoreProductCategoryListResponse>(
+      `/store/product-categories`,
+      {
+        query: {
+          fields: "*category_children",
+          handle,
+        },
+        cache: "force-cache",
+        next: { revalidate: 300 },
+      }
+    )
+    .then(({ product_categories }) => product_categories[0])
+}

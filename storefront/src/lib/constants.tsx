@@ -1,41 +1,41 @@
 import React from "react"
-import { CreditCard } from "@medusajs/icons"
-
-import Ideal from "@modules/common/icons/ideal"
-import Bancontact from "@modules/common/icons/bancontact"
-import PayPal from "@modules/common/icons/paypal"
+import { Cash, CreditCard } from "@medusajs/icons"
 
 /* Map of payment provider_id to their title and icon. Add in any payment providers you want to use. */
 export const paymentInfoMap: Record<
   string,
   { title: string; icon: React.JSX.Element }
 > = {
+  "pp_card_stripe-connect": {
+    title: "Credit card",
+    icon: <CreditCard />,
+  },
   pp_stripe_stripe: {
     title: "Credit card",
     icon: <CreditCard />,
   },
   "pp_stripe-ideal_stripe": {
     title: "iDeal",
-    icon: <Ideal />,
+    icon: <CreditCard />,
   },
   "pp_stripe-bancontact_stripe": {
     title: "Bancontact",
-    icon: <Bancontact />,
+    icon: <CreditCard />,
   },
   pp_paypal_paypal: {
     title: "PayPal",
-    icon: <PayPal />,
+    icon: <CreditCard />,
   },
   pp_system_default: {
     title: "Manual Payment",
-    icon: <CreditCard />,
+    icon: <Cash />,
   },
   // Add more payment providers here
 }
 
 // This only checks if it is native stripe for card payments, it ignores the other stripe-based providers
 export const isStripe = (providerId?: string) => {
-  return providerId?.startsWith("pp_stripe_")
+  return providerId?.startsWith("pp_card_stripe-connect")
 }
 export const isPaypal = (providerId?: string) => {
   return providerId?.startsWith("pp_paypal")
