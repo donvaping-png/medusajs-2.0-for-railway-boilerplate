@@ -18,10 +18,6 @@ export const ProductDetailsPage = async ({
 
   if (!prod) return null
 
-  if (prod.seller?.store_status === "SUSPENDED") {
-    return NotFound()
-  }
-
   return (
     <>
       <div className="flex flex-col md:flex-row lg:gap-12">
@@ -32,14 +28,15 @@ export const ProductDetailsPage = async ({
           <ProductDetails product={prod} locale={locale} />
         </div>
       </div>
-      <div className="my-8">
-        <HomeProductSection
-          heading="More from this seller"
-          products={prod.seller?.products}
-          // seller_handle={prod.seller?.handle}
-          locale={locale}
-        />
-      </div>
+      {prod.seller?.products && prod.seller.products.length > 0 && (
+        <div className="my-8">
+          <HomeProductSection
+            heading="More from this seller"
+            products={prod.seller.products}
+            locale={locale}
+          />
+        </div>
+      )}
     </>
   )
 }

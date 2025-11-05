@@ -12,8 +12,8 @@ type Story = StoryObj<typeof Hero>
 
 export const FirstStory: Story = {
   args: {
-    heading: "Snag your style in a flash",
-    paragraph: "Buy, sell, and discover pre-loved from the trendiest brands.",
+    heading: "¡Imprime tus pegatinas personalizadas!",
+    paragraph: "Haga sus propias pegatinas y etiquetas personalizadas. Entrega exprés en tan solo 2-4 días laborables. ¡Obtén una prueba instantánea y envío gratis!",
     image: "/images/hero/Image.jpg",
     buttons: [
       { label: "Buy now", path: "#" },
