@@ -1,7 +1,6 @@
 import { Carousel } from "@/components/cells"
 import { ProductCard } from "../ProductCard/ProductCard"
 import { listProducts } from "@/lib/data/products"
-import { Product } from "@/types/product"
 import { HttpTypes } from "@medusajs/types"
 import { getProductPrice } from "@/lib/helpers/get-product-price"
 
@@ -11,7 +10,7 @@ export const HomeProductsCarousel = async ({
   home,
 }: {
   locale: string
-  sellerProducts: Product[]
+  sellerProducts: HttpTypes.StoreProduct[]
   home: boolean
 }) => {
   // Si es home y ya tenemos productos, usarlos directamente
@@ -23,8 +22,8 @@ export const HomeProductsCarousel = async ({
           items={sellerProducts.map((product) => (
             <ProductCard
               key={product.id}
-              product={product}
-              api_product={product as HttpTypes.StoreProduct}
+              product={product as any}
+              api_product={product}
             />
           ))}
         />
@@ -57,10 +56,10 @@ export const HomeProductsCarousel = async ({
           (product) => (
             <ProductCard
               key={product.id}
-              product={product}
+              product={product as any}
               api_product={
                 home
-                  ? (product as HttpTypes.StoreProduct)
+                  ? product
                   : products.find((p) => {
                       const { cheapestPrice } = getProductPrice({
                         product: p,
