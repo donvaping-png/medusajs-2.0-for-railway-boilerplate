@@ -32,7 +32,7 @@ export const ProductListing = async ({
     },
   })
 
-  const { products } = await response
+  const { products } = response
 
   const count = products.length
 

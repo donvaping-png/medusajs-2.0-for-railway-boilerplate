@@ -162,8 +162,8 @@ export default async function Home({
 
       <Hero
         image="/images/hero/Image.jpg"
-        heading="Snag your style in a flash"
-        paragraph="Buy, sell, and discover pre-loved gems from the trendiest brands."
+        heading="¡Imprime tus pegatinas personalizadas!"
+        paragraph="Haga sus propias pegatinas y etiquetas personalizadas. Entrega exprés en tan solo 2-4 días laborables. ¡Obtén una prueba instantánea y envío gratis!"
         buttons={[
           { label: "Buy now", path: "/categories" },
           {

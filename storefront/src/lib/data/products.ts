@@ -78,8 +78,7 @@ export const listProducts = async ({
         offset,
         region_id: region?.id,
         fields:
-          "*variants.calculated_price,+variants.inventory_quantity,*seller,*variants,*seller.products," +
-          "*seller.reviews,*seller.reviews.customer,*seller.reviews.seller,*seller.products.variants,*attribute_values,*attribute_values.attribute",
+          "*variants.calculated_price,+variants.inventory_quantity,*variants",
         ...queryParams,
       },
       headers,
@@ -87,31 +86,11 @@ export const listProducts = async ({
       cache: useCached ? "force-cache" : "no-cache",
     })
     .then(({ products: productsRaw, count }) => {
-      const products = productsRaw.filter(
-        (product) => product.seller?.store_status !== "SUSPENDED"
-      )
-
       const nextPage = count > offset + limit ? pageParam + 1 : null
-
-      const response = products.filter((prod) => {
-        // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-        const reviews = prod.seller?.reviews.filter((item) => !!item) ?? []
-        return (
-          // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-          prod?.seller && {
-            ...prod,
-            seller: {
-              // @ts-ignore Property 'seller' exists but TypeScript doesn't recognize it
-              ...prod.seller,
-              reviews,
-            },
-          }
-        )
-      })
 
       return {
         response: {
-          products: response,
+          products: productsRaw,
           count,
         },
         nextPage: nextPage,
@@ -173,9 +152,7 @@ export const listProductsWithSort = async ({
     countryCode,
   })
 
-  const filteredProducts = seller_id
-    ? products.filter((product) => product.seller?.id === seller_id)
-    : products
+  const filteredProducts = products
 
   const pricedProducts = filteredProducts.filter((prod) =>
     prod.variants?.some((variant) => variant.calculated_price !== null)
