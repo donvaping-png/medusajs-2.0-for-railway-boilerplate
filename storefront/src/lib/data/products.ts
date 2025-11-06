@@ -172,3 +172,47 @@ export const listProductsWithSort = async ({
     queryParams,
   }
 }
+
+// Bundled Products
+export type BundleProduct = {
+  id: string
+  title: string
+  product: {
+    id: string
+    thumbnail: string
+    title: string
+    handle: string
+  }
+  items: {
+    id: string
+    title: string
+    quantity: number
+    product: HttpTypes.StoreProduct
+  }[]
+}
+
+export const getBundleProduct = async (
+  id: string,
+  {
+    currency_code,
+    region_id,
+  }: {
+    currency_code?: string
+    region_id?: string
+  }
+) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+
+  return sdk.client.fetch<{
+    bundle_product: BundleProduct
+  }>(`/store/bundle-products/${id}`, {
+    method: "GET",
+    headers,
+    query: {
+      currency_code,
+      region_id,
+    },
+  })
+}
