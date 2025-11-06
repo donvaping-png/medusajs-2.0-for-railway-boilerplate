@@ -51,6 +51,9 @@ const medusaConfig = {
   },
   modules: [
     {
+      resolve: './src/modules/bundled-product',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {

@@ -18,7 +18,8 @@
     "ib": "init-backend",
     "start": "init-backend && cd .medusa/server && medusa start --verbose",
     "dev": "medusa develop",
-    "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002"
+    "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002",
+    "migrate": "medusa db:migrate"
   },
   "dependencies": {
     "@medusajs/admin-sdk": "2.10.2",
@@ -39,7 +40,7 @@
     "ajv": "^8.12.0",
     "ajv-formats": "^3.0.1",
     "awilix": "^8.0.1",
-    "medusa-variant-images": "^1.1.4",
+    "medusa-variant-images": "1.1.4",
     "medusajs-launch-utils": "0.0.18",
     "minio": "^8.0.3",
     "pg": "^8.13.1",
