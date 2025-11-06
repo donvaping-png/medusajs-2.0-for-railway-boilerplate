@@ -1,21 +1,14 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "zod"
 import { addBundleToCartWorkflow } from "../../../../../workflows/add-bundle-to-cart"
 
-export const PostCartsBundledLineItemsSchema = z.object({
-  bundle_id: z.string(),
-  quantity: z.number().default(1),
-  items: z.array(
-    z.object({
-      item_id: z.string(),
-      variant_id: z.string(),
-    })
-  ),
-})
-
-export type PostCartsBundledLineItemsType = z.infer<
-  typeof PostCartsBundledLineItemsSchema
->
+export type PostCartsBundledLineItemsType = {
+  bundle_id: string
+  quantity?: number
+  items: {
+    item_id: string
+    variant_id: string
+  }[]
+}
 
 export async function POST(
   req: MedusaRequest<PostCartsBundledLineItemsType>,
