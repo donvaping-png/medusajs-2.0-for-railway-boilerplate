@@ -13,7 +13,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   const metaDefinitionService = req.scope.resolve<MetaDefinitionService>("metaDefinitionService")
 
-  const { scope, key, label, type, required, options, default_value, validations } = req.body
+  const { scope, key, label, type, required, options, default_value, validations } = req.body as any
 
   if (!scope || !key || !type) {
     return res.status(400).json({

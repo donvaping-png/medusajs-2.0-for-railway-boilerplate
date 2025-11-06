@@ -1,5 +1,6 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { Modules } from "@medusajs/framework/utils"
+import { CreateProductCategoryDTO } from "@medusajs/framework/types"
 import MetaValueService from "../../../services/meta-value.service"
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
@@ -9,7 +10,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     // Use Medusa's product module to create the category
     const productModuleService = req.scope.resolve(Modules.PRODUCT)
     
-    const category = await productModuleService.createProductCategories(req.body)
+    const category = await productModuleService.createProductCategories(req.body as CreateProductCategoryDTO)
 
     // Initialize default meta values for the new category
     await metaValueService.initDefaultsForNewCategory(category.id)

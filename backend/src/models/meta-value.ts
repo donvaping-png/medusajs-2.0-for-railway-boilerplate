@@ -13,7 +13,7 @@ export class MetaValue {
   @Property({ type: "text" })
   scope_id!: string
 
-  @ManyToOne(() => MetaDefinition, { fieldName: "def_id", onDelete: "cascade" })
+  @ManyToOne(() => MetaDefinition, { fieldName: "def_id" })
   def!: MetaDefinition
 
   @Property({ type: "jsonb", nullable: true })

@@ -348,7 +348,7 @@ export default async function seedDemoData({ container }: ExecArgs) {
   });
 
   // Initialize meta defaults for all created categories
-  const metaValueService = container.resolve("metaValueService");
+  const metaValueService: any = container.resolve("metaValueService");
   for (const category of categoryResult) {
     await metaValueService.initDefaultsForNewCategory(category.id);
     logger.info(`Initialized meta defaults for category: ${category.name}`);
