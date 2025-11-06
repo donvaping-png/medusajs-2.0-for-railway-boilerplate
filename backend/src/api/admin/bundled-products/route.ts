@@ -2,7 +2,7 @@ import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/utils"
+import { z } from "zod"
 import { AdminCreateProduct } from "@medusajs/medusa/api/admin/products/validators"
 import {
   createBundledProductWorkflow,
@@ -18,7 +18,7 @@ export const PostBundledProductsSchema = z.object({
       quantity: z.number(),
     })
   ),
-}) as z.ZodObject<any, any>
+})
 
 export type PostBundledProductsType = z.infer<typeof PostBundledProductsSchema>
 

@@ -1,5 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { z } from "@medusajs/framework/utils"
+import { z } from "zod"
 import { addBundleToCartWorkflow } from "../../../../../workflows/add-bundle-to-cart"
 
 export const PostCartsBundledLineItemsSchema = z.object({
@@ -11,7 +11,7 @@ export const PostCartsBundledLineItemsSchema = z.object({
       variant_id: z.string(),
     })
   ),
-}) as z.ZodObject<any, any>
+})
 
 export type PostCartsBundledLineItemsType = z.infer<
   typeof PostCartsBundledLineItemsSchema
