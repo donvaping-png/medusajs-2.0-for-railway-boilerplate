@@ -1,8 +1,16 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { Container, Heading, Button, Table, Badge } from "@medusajs/ui"
+import {
+  Container,
+  Heading,
+  Button,
+  Table,
+  Badge,
+  FocusModal,
+} from "@medusajs/ui"
 import { CubeSolid, PlusMini } from "@medusajs/icons"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+import { CreateBundleForm } from "../../components/create-bundle-form"
 
 type Bundle = {
   id: string
@@ -25,6 +33,7 @@ type Bundle = {
 const BundledProductsPage = () => {
   const [bundles, setBundles] = useState<Bundle[]>([])
   const [loading, setLoading] = useState(true)
+  const [showCreateModal, setShowCreateModal] = useState(false)
 
   useEffect(() => {
     fetchBundles()
@@ -57,11 +66,32 @@ const BundledProductsPage = () => {
     <Container>
       <div className="flex items-center justify-between mb-4">
         <Heading level="h1">Bundled Products</Heading>
-        <Button variant="primary" size="small">
+        <Button
+          variant="primary"
+          size="small"
+          onClick={() => setShowCreateModal(true)}
+        >
           <PlusMini />
           Crear Bundle
         </Button>
       </div>
+
+      <FocusModal open={showCreateModal} onOpenChange={setShowCreateModal}>
+        <FocusModal.Content>
+          <FocusModal.Header>
+            <Heading>Crear Nuevo Bundle</Heading>
+          </FocusModal.Header>
+          <FocusModal.Body>
+            <CreateBundleForm
+              onSuccess={() => {
+                setShowCreateModal(false)
+                fetchBundles()
+              }}
+              onCancel={() => setShowCreateModal(false)}
+            />
+          </FocusModal.Body>
+        </FocusModal.Content>
+      </FocusModal>
 
       {bundles.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -72,7 +102,7 @@ const BundledProductsPage = () => {
           <p className="text-ui-fg-subtle mb-4">
             Crea tu primer bundle para agrupar productos
           </p>
-          <Button variant="primary">
+          <Button variant="primary" onClick={() => setShowCreateModal(true)}>
             <PlusMini />
             Crear Bundle
           </Button>
