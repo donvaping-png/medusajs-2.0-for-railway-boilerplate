@@ -184,58 +184,33 @@ const CartShippingMethodsSection: React.FC<ShippingProps> = ({
     )
     .map((item) => item.product?.seller?.name)
 
-  return (
-    <div className="border p-4 rounded-sm bg-ui-bg-interactive">
-      {/* {missingModal && (
-        <Modal
-          heading="Missing seller shipping option"
-          onClose={() => router.push(`/${pathname.split("/")[1]}/cart`)}
-        >
-          <div className="p-4">
-            <h2 className="heading-sm">
-              Some of the sellers in your cart do not have shipping options.
-            </h2>
+  const hasShippingMethod = (cart.shipping_methods?.length ?? 0) > 0
+  const isComplete = hasShippingMethod && !isOpen
 
-            <p className="text-md mt-3">
-              Please remove the{" "}
-              <span className="font-bold">
-                {missingSellers?.map(
-                  (seller, index) =>
-                    `${seller}${
-                      index === missingSellers.length - 1 ? " " : ", "
-                    }`
-                )}
-              </span>{" "}
-              items or contact{" "}
-              {missingSellers && missingSellers?.length > 1 ? "them" : "him"} to
-              get the shipping options.
-            </p>
+  return (
+    <div className="bg-white border rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
+            isComplete ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}>
+            {isComplete ? '✓' : '2'}
           </div>
-        </Modal>
-      )} */}
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline items-center"
-        >
-          {!isOpen && (cart.shipping_methods?.length ?? 0) > 0 && (
-            <CheckCircleSolid />
-          )}
-          Delivery
-        </Heading>
-        {!isOpen && (
-          <Text>
-            <Button onClick={handleEdit} variant="tonal">
-              Edit
-            </Button>
-          </Text>
+          <Heading level="h2" className="text-xl font-semibold">
+            Método de Envío
+          </Heading>
+        </div>
+        {!isOpen && hasShippingMethod && (
+          <Button onClick={handleEdit} variant="tonal" className="text-sm">
+            Cambiar
+          </Button>
         )}
       </div>
       {isOpen ? (
         <>
-          <div className="grid">
+          <div className="mt-4">
             <div data-testid="delivery-options-container">
-              <div className="pb-8 md:pt-0 pt-2">
+              <div className="space-y-4">
                 {Object.keys(groupedBySellerId).map((key) => {
                   return (
                     <div key={key} className="mb-4">
@@ -257,7 +232,7 @@ const CartShippingMethodsSection: React.FC<ShippingProps> = ({
                             {({ open }) => (
                               <>
                                 <span className="block truncate">
-                                  Choose delivery option
+                                  Elige una opción de envío
                                 </span>
                                 <ChevronUpDown
                                   className={clx(
@@ -328,7 +303,7 @@ const CartShippingMethodsSection: React.FC<ShippingProps> = ({
               </div>
             </div>
           </div>
-          <div>
+          <div className="mt-6">
             <ErrorMessage
               error={error}
               data-testid="delivery-option-error-message"
@@ -336,25 +311,25 @@ const CartShippingMethodsSection: React.FC<ShippingProps> = ({
             <Button
               onClick={handleSubmit}
               variant="tonal"
+              className="w-full"
               disabled={!cart.shipping_methods?.[0]}
               loading={isLoadingPrices}
             >
-              Continue to payment
+              Continuar al Pago
             </Button>
           </div>
         </>
       ) : (
-        <div>
-          <div className="text-small-regular">
+        <div className="mt-4">
+          <div className="bg-gray-50 rounded-md p-4">
             {cart && (cart.shipping_methods?.length ?? 0) > 0 && (
-              <div className="flex flex-col">
+              <div className="space-y-2">
                 {cart.shipping_methods?.map((method) => (
-                  <div key={method.id} className="mb-4 border rounded-md p-4">
-                    <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Method
+                  <div key={method.id}>
+                    <Text className="font-medium text-sm">
+                      {method.name}
                     </Text>
-                    <Text className="txt-medium text-ui-fg-subtle">
-                      {method.name}{" "}
+                    <Text className="text-sm text-gray-600">
                       {convertToLocale({
                         amount: method.amount!,
                         currency_code: cart?.currency_code,

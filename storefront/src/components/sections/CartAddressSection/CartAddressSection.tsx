@@ -54,20 +54,22 @@ export const CartAddressSection = ({
   }
 
   return (
-    <div className="border p-4 rounded-sm bg-ui-bg-interactive">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline items-center"
-        >
-          {!isOpen && <CheckCircleSolid />} Shipping Address
-        </Heading>
+    <div className="bg-white border rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
+            isAddress ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}>
+            {isAddress ? '✓' : '1'}
+          </div>
+          <Heading level="h2" className="text-xl font-semibold">
+            Información de Contacto
+          </Heading>
+        </div>
         {!isOpen && isAddress && (
-          <Text>
-            <Button onClick={handleEdit} variant="tonal">
-              Edit
-            </Button>
-          </Text>
+          <Button onClick={handleEdit} variant="tonal" className="text-sm">
+            Cambiar
+          </Button>
         )}
       </div>
       <form
@@ -78,7 +80,7 @@ export const CartAddressSection = ({
         }}
       >
         {isOpen ? (
-          <div className="pb-8">
+          <div className="mt-4">
             <ShippingAddress
               customer={customer}
               checked={sameAsBilling}
@@ -86,11 +88,11 @@ export const CartAddressSection = ({
               cart={cart}
             />
             <Button
-              className="mt-6"
+              className="mt-6 w-full"
               data-testid="submit-address-button"
               variant="tonal"
             >
-              Save
+              Continuar al Envío
             </Button>
             <ErrorMessage
               error={message !== "success" && message}
@@ -98,28 +100,32 @@ export const CartAddressSection = ({
             />
           </div>
         ) : (
-          <div>
-            <div className="text-small-regular">
+          <div className="mt-4">
+            <div className="bg-gray-50 rounded-md p-4">
               {cart && cart.shipping_address ? (
-                <div className="flex items-start gap-x-8">
-                  <div className="flex items-start gap-x-1 w-full">
-                    <div>
-                      <Text className="txt-medium-plus font-bold">
-                        {cart.shipping_address.first_name}{" "}
-                        {cart.shipping_address.last_name}
-                      </Text>
-                      <Text>
-                        {cart.shipping_address.address_1}{" "}
-                        {cart.shipping_address.address_2},{" "}
-                        {cart.shipping_address.postal_code}{" "}
-                        {cart.shipping_address.city},{" "}
-                        {cart.shipping_address.country_code?.toUpperCase()}
-                      </Text>
-                      <Text>
-                        {cart.email}, {cart.shipping_address.phone}
-                      </Text>
-                    </div>
-                  </div>
+                <div className="space-y-1">
+                  <Text className="font-medium">
+                    {cart.shipping_address.first_name}{" "}
+                    {cart.shipping_address.last_name}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {cart.email}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {cart.shipping_address.address_1}
+                    {cart.shipping_address.address_2 && `, ${cart.shipping_address.address_2}`}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {cart.shipping_address.city}, {cart.shipping_address.postal_code}
+                  </Text>
+                  <Text className="text-sm text-gray-600">
+                    {cart.shipping_address.country_code?.toUpperCase()}
+                  </Text>
+                  {cart.shipping_address.phone && (
+                    <Text className="text-sm text-gray-600">
+                      {cart.shipping_address.phone}
+                    </Text>
+                  )}
                 </div>
               ) : (
                 <div>
@@ -128,13 +134,6 @@ export const CartAddressSection = ({
               )}
             </div>
           </div>
-        )}
-        {isAddress && !searchParams.get("step") && (
-          <LocalizedClientLink href="/checkout?step=delivery">
-            <Button className="mt-6" variant="tonal">
-              Continue to Delivery
-            </Button>
-          </LocalizedClientLink>
         )}
       </form>
     </div>

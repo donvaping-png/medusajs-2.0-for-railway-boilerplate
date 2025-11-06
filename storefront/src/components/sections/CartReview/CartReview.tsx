@@ -14,11 +14,14 @@ const Review = ({ cart }: { cart: any }) => {
     (cart.payment_collection || paidByGiftcard)
 
   return (
-    <div>
-      <div className="w-full mb-6">
+    <div className="bg-white border rounded-lg p-6">
+      <h2 className="text-xl font-semibold mb-6">Resumen del Pedido</h2>
+      
+      <div className="mb-6">
         <CartItems cart={cart} />
       </div>
-      <div className="w-full mb-6 border rounded-sm p-4">
+      
+      <div className="border-t pt-4">
         <CartSummary
           item_total={cart?.item_subtotal || 0}
           shipping_total={cart?.shipping_subtotal || 0}
@@ -30,7 +33,9 @@ const Review = ({ cart }: { cart: any }) => {
       </div>
 
       {previousStepsCompleted && (
-        <PaymentButton cart={cart} data-testid="submit-order-button" />
+        <div className="mt-6">
+          <PaymentButton cart={cart} data-testid="submit-order-button" />
+        </div>
       )}
     </div>
   )

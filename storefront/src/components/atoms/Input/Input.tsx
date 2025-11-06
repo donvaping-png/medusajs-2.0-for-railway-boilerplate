@@ -2,7 +2,7 @@
 import { cn } from "@/lib/utils"
 
 import { CloseIcon } from "@/icons"
-import { useEffect, useState } from "react"
+import { useEffect, useState, forwardRef } from "react"
 import { EyeMini, EyeSlashMini } from "@medusajs/icons"
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -13,15 +13,10 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   changeValue?: (value: string) => void
 }
 
-export function Input({
-  label,
-  icon,
-  clearable,
-  className,
-  error,
-  changeValue,
-  ...props
-}: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { label, icon, clearable, className, error, changeValue, ...props },
+  ref
+) {
   const [showPassword, setShowPassword] = useState(false)
   const [inputType, setInputType] = useState(props.type)
   let paddingY = ""
@@ -38,8 +33,9 @@ export function Input({
     }
   }, [props.type, showPassword])
 
-  const changeHandler = (value: string) => {
-    if (changeValue) changeValue(value)
+  const changeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (changeValue) changeValue(e.target.value)
+    if (props.onChange) props.onChange(e)
   }
 
   const clearHandler = () => {
@@ -57,6 +53,7 @@ export function Input({
         )}
 
         <input
+          ref={ref}
           className={cn(
             "w-full px-[16px] py-[12px] border rounded-sm bg-component-secondary focus:border-primary focus:outline-none focus:ring-0",
             error && "border-negative focus:border-negative",
@@ -64,9 +61,9 @@ export function Input({
             paddingY,
             className
           )}
-          value={props.value}
-          onChange={(e) => changeHandler(e.target.value)}
           {...props}
+          value={props.value}
+          onChange={changeHandler}
           type={props.type === "password" ? inputType : props.type}
         />
         {clearable && props.value && (
@@ -89,4 +86,4 @@ export function Input({
       </div>
     </label>
   )
-}
+})

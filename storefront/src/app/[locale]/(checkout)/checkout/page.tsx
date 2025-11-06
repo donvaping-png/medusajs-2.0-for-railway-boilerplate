@@ -14,8 +14,8 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
 export const metadata: Metadata = {
-  title: "Checkout",
-  description: "My cart page - Checkout",
+  title: "Finalizar Compra",
+  description: "Página de checkout - Finalizar compra",
 }
 
 export default async function CheckoutPage({}) {
@@ -23,7 +23,7 @@ export default async function CheckoutPage({}) {
     <Suspense
       fallback={
         <div className="container flex items-center justify-center">
-          Loading...
+          Cargando...
         </div>
       }
     >
@@ -45,22 +45,32 @@ async function CheckoutPageContent({}) {
 
   return (
     <PaymentWrapper cart={cart}>
-      <main className="container">
-        <div className="grid lg:grid-cols-11 gap-8">
-          <div className="flex flex-col gap-4 lg:col-span-6">
-            <CartAddressSection cart={cart} customer={customer} />
-            <CartShippingMethodsSection
-              cart={cart}
-              availableShippingMethods={shippingMethods as any}
-            />
-            <CartPaymentSection
-              cart={cart}
-              availablePaymentMethods={paymentMethods}
-            />
-          </div>
+      <main className="bg-ui-bg-subtle min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16">
+            {/* Left side - Checkout form */}
+            <div className="order-2 lg:order-1">
+              <div className="mb-8">
+                <h1 className="text-3xl font-semibold mb-2">Finalizar Compra</h1>
+              </div>
+              
+              <div className="flex flex-col gap-6">
+                <CartAddressSection cart={cart} customer={customer} />
+                <CartShippingMethodsSection
+                  cart={cart}
+                  availableShippingMethods={shippingMethods as any}
+                />
+                <CartPaymentSection
+                  cart={cart}
+                  availablePaymentMethods={paymentMethods}
+                />
+              </div>
+            </div>
 
-          <div className="lg:col-span-5">
-            <CartReview cart={cart} />
+            {/* Right side - Order summary */}
+            <div className="order-1 lg:order-2 lg:sticky lg:top-8 lg:self-start">
+              <CartReview cart={cart} />
+            </div>
           </div>
         </div>
       </main>

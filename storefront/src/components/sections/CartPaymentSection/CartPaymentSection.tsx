@@ -117,139 +117,148 @@ const CartPaymentSection = ({
     setError(null)
   }, [isOpen])
 
+  const isComplete = paymentReady && !isOpen
+
   return (
-    <div className="border p-4 rounded-sm bg-ui-bg-interactive">
-      <div className="flex flex-row items-center justify-between mb-6">
-        <Heading
-          level="h2"
-          className="flex flex-row text-3xl-regular gap-x-2 items-baseline items-center"
-        >
-          {!isOpen && paymentReady && <CheckCircleSolid />}
-          Payment
-        </Heading>
-        {!isOpen && (
-          <Text>
-            <Button onClick={handleEdit} variant="tonal">
-              Edit
-            </Button>
-          </Text>
+    <div className="bg-white border rounded-lg p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
+            isComplete ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-700'
+          }`}>
+            {isComplete ? '✓' : '3'}
+          </div>
+          <Heading level="h2" className="text-xl font-semibold">
+            Pago
+          </Heading>
+        </div>
+        {!isOpen && paymentReady && (
+          <Button onClick={handleEdit} variant="tonal" className="text-sm">
+            Cambiar
+          </Button>
         )}
       </div>
       <div>
         <div className={isOpen ? "block" : "hidden"}>
-          {!paidByGiftcard && availablePaymentMethods?.length && (
-            <>
-              <RadioGroup
-                value={selectedPaymentMethod}
-                onChange={(value: string) => setPaymentMethod(value)}
-              >
-                {availablePaymentMethods.map((paymentMethod) => (
-                  <div key={paymentMethod.id}>
-                    {isStripeFunc(paymentMethod.id) ? (
-                      <StripeCardContainer
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                        paymentInfoMap={paymentInfoMap}
-                        setCardBrand={setCardBrand}
-                        setError={setError}
-                        setCardComplete={setCardComplete}
-                      />
-                    ) : (
-                      <PaymentContainer
-                        paymentInfoMap={paymentInfoMap}
-                        paymentProviderId={paymentMethod.id}
-                        selectedPaymentOptionId={selectedPaymentMethod}
-                      />
-                    )}
-                  </div>
-                ))}
-              </RadioGroup>
-            </>
-          )}
+          <div className="mt-4">
+            {!paidByGiftcard && availablePaymentMethods?.length && (
+              <>
+                <RadioGroup
+                  value={selectedPaymentMethod}
+                  onChange={(value: string) => setPaymentMethod(value)}
+                  className="space-y-3"
+                >
+                  {availablePaymentMethods.map((paymentMethod) => (
+                    <div key={paymentMethod.id}>
+                      {isStripeFunc(paymentMethod.id) ? (
+                        <StripeCardContainer
+                          paymentProviderId={paymentMethod.id}
+                          selectedPaymentOptionId={selectedPaymentMethod}
+                          paymentInfoMap={paymentInfoMap}
+                          setCardBrand={setCardBrand}
+                          setError={setError}
+                          setCardComplete={setCardComplete}
+                        />
+                      ) : (
+                        <PaymentContainer
+                          paymentInfoMap={paymentInfoMap}
+                          paymentProviderId={paymentMethod.id}
+                          selectedPaymentOptionId={selectedPaymentMethod}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </RadioGroup>
+              </>
+            )}
 
-          {paidByGiftcard && (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
-              </Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
-            </div>
-          )}
+            {paidByGiftcard && (
+              <div className="bg-gray-50 rounded-md p-4">
+                <Text className="font-medium mb-1">
+                  Método de pago
+                </Text>
+                <Text
+                  className="text-sm text-gray-600"
+                  data-testid="payment-method-summary"
+                >
+                  Tarjeta regalo
+                </Text>
+              </div>
+            )}
 
-          <ErrorMessage
-            error={error}
-            data-testid="payment-method-error-message"
-          />
+            <ErrorMessage
+              error={error}
+              data-testid="payment-method-error-message"
+            />
 
-          <Button
-            onClick={handleSubmit}
-            variant="tonal"
-            loading={isLoading}
-            disabled={
-              (isStripe && !cardComplete) ||
-              (!selectedPaymentMethod && !paidByGiftcard)
-            }
-          >
-            {!activeSession && isStripeFunc(selectedPaymentMethod)
-              ? " Enter card details"
-              : "Continue to review"}
-          </Button>
+            <Button
+              onClick={handleSubmit}
+              variant="tonal"
+              className="w-full mt-6"
+              loading={isLoading}
+              disabled={
+                (isStripe && !cardComplete) ||
+                (!selectedPaymentMethod && !paidByGiftcard)
+              }
+            >
+              {!activeSession && isStripeFunc(selectedPaymentMethod)
+                ? "Introducir Datos de Tarjeta"
+                : "Revisar Pedido"}
+            </Button>
+          </div>
         </div>
 
         <div className={isOpen ? "hidden" : "block"}>
-          {cart && paymentReady && activeSession ? (
-            <div className="flex items-start gap-x-1 w-full">
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Payment method
-                </Text>
-                <Text
-                  className="txt-medium text-ui-fg-subtle"
-                  data-testid="payment-method-summary"
-                >
-                  {paymentInfoMap[activeSession?.provider_id]?.title ||
-                    activeSession?.provider_id}
-                </Text>
-              </div>
-              <div className="flex flex-col w-1/3">
-                <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                  Payment details
-                </Text>
-                <div
-                  className="flex gap-2 txt-medium text-ui-fg-subtle items-center"
-                  data-testid="payment-details-summary"
-                >
-                  <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
-                    {paymentInfoMap[selectedPaymentMethod]?.icon || (
-                      <CreditCard />
-                    )}
-                  </Container>
-                  <Text>
-                    {isStripeFunc(selectedPaymentMethod) && cardBrand
-                      ? cardBrand
-                      : "Another step will appear"}
+          <div className="mt-4 bg-gray-50 rounded-md p-4">
+            {cart && paymentReady && activeSession ? (
+              <div className="space-y-3">
+                <div>
+                  <Text className="font-medium mb-1">
+                    Método de pago
+                  </Text>
+                  <Text
+                    className="text-sm text-gray-600"
+                    data-testid="payment-method-summary"
+                  >
+                    {paymentInfoMap[activeSession?.provider_id]?.title ||
+                      activeSession?.provider_id}
                   </Text>
                 </div>
+                <div>
+                  <Text className="font-medium mb-1">
+                    Detalles de pago
+                  </Text>
+                  <div
+                    className="flex gap-2 text-sm text-gray-600 items-center"
+                    data-testid="payment-details-summary"
+                  >
+                    <Container className="flex items-center h-7 w-fit p-2 bg-ui-button-neutral-hover">
+                      {paymentInfoMap[selectedPaymentMethod]?.icon || (
+                        <CreditCard />
+                      )}
+                    </Container>
+                    <Text>
+                      {isStripeFunc(selectedPaymentMethod) && cardBrand
+                        ? cardBrand
+                        : "Listo para pagar"}
+                    </Text>
+                  </div>
+                </div>
               </div>
-            </div>
-          ) : paidByGiftcard ? (
-            <div className="flex flex-col w-1/3">
-              <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                Payment method
-              </Text>
-              <Text
-                className="txt-medium text-ui-fg-subtle"
-                data-testid="payment-method-summary"
-              >
-                Gift card
-              </Text>
-            </div>
-          ) : null}
+            ) : paidByGiftcard ? (
+              <div>
+                <Text className="font-medium mb-1">
+                  Método de pago
+                </Text>
+                <Text
+                  className="text-sm text-gray-600"
+                  data-testid="payment-method-summary"
+                >
+                  Tarjeta regalo
+                </Text>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

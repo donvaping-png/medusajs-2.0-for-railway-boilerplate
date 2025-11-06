@@ -1,10 +1,11 @@
 import { HttpTypes } from "@medusajs/types"
 import { Container } from "@medusajs/ui"
 import { mapKeys } from "lodash"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo, useState, useCallback } from "react"
 import { Input } from "@/components/atoms"
 import AddressSelect from "@/components/cells/AddressSelect/AddressSelect"
 import CountrySelect from "@/components/cells/CountrySelect/CountrySelect"
+import { AddressAutocomplete } from "@/components/molecules/AddressAutocomplete"
 import { usePathname } from "next/navigation"
 
 const ShippingAddress = ({
@@ -21,7 +22,9 @@ const ShippingAddress = ({
   const pathname = usePathname()
 
   const locale = pathname.split("/")[1]
-  const [formData, setFormData] = useState<Record<string, any>>({
+  
+  // Initialize formData with a function to ensure proper initial values
+  const [formData, setFormData] = useState<Record<string, any>>(() => ({
     "shipping_address.first_name": cart?.shipping_address?.first_name || "",
     "shipping_address.last_name": cart?.shipping_address?.last_name || "",
     "shipping_address.address_1": cart?.shipping_address?.address_1 || "",
@@ -32,8 +35,8 @@ const ShippingAddress = ({
       cart?.shipping_address?.country_code || locale,
     "shipping_address.province": cart?.shipping_address?.province || "",
     "shipping_address.phone": cart?.shipping_address?.phone || "",
-    email: cart?.email || "",
-  })
+    email: cart?.email || customer?.email || "",
+  }))
 
   // check if customer has saved addresses that are in the current region
   const addressesInRegion = useMemo(
@@ -69,16 +72,8 @@ const ShippingAddress = ({
       }))
   }
 
-  useEffect(() => {
-    // Ensure cart is not null and has a shipping_address before setting form data
-    if (cart && cart.shipping_address) {
-      setFormAddress(cart?.shipping_address, cart?.email)
-    }
-
-    if (cart && !cart.email && customer?.email) {
-      setFormAddress(undefined, customer.email)
-    }
-  }, [cart]) // Add cart as a dependency
+  // Remove the useEffect that was causing the controlled/uncontrolled warning
+  // The initial state is now properly set in useState initializer
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -90,6 +85,24 @@ const ShippingAddress = ({
       [e.target.name]: e.target.value,
     })
   }
+
+  const handlePlaceSelected = useCallback((place: {
+    address: string
+    city: string
+    province: string
+    postalCode: string
+    countryCode: string
+  }) => {
+    console.log("Place selected:", place) // Debug log
+    setFormData((prev) => ({
+      ...prev,
+      "shipping_address.address_1": place.address,
+      "shipping_address.city": place.city,
+      "shipping_address.province": place.province,
+      "shipping_address.postal_code": place.postalCode,
+      "shipping_address.country_code": place.countryCode,
+    }))
+  }, [])
 
   return (
     <>
@@ -113,7 +126,7 @@ const ShippingAddress = ({
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Input
-          label="First name"
+          label="Nombre"
           name="shipping_address.first_name"
           autoComplete="given-name"
           value={formData["shipping_address.first_name"]}
@@ -122,7 +135,7 @@ const ShippingAddress = ({
           data-testid="shipping-first-name-input"
         />
         <Input
-          label="Last name"
+          label="Apellidos"
           name="shipping_address.last_name"
           autoComplete="family-name"
           value={formData["shipping_address.last_name"]}
@@ -130,17 +143,18 @@ const ShippingAddress = ({
           required
           data-testid="shipping-last-name-input"
         />
+        <div className="lg:col-span-2">
+          <AddressAutocomplete
+            label="Dirección"
+            name="shipping_address.address_1"
+            value={formData["shipping_address.address_1"]}
+            onChange={handleChange}
+            onPlaceSelected={handlePlaceSelected}
+            required
+          />
+        </div>
         <Input
-          label="Address"
-          name="shipping_address.address_1"
-          autoComplete="address-line1"
-          value={formData["shipping_address.address_1"]}
-          onChange={handleChange}
-          required
-          data-testid="shipping-address-input"
-        />
-        <Input
-          label="Company"
+          label="Empresa (opcional)"
           name="shipping_address.company"
           value={formData["shipping_address.company"]}
           onChange={handleChange}
@@ -148,7 +162,7 @@ const ShippingAddress = ({
           data-testid="shipping-company-input"
         />
         <Input
-          label="Postal code"
+          label="Código Postal"
           name="shipping_address.postal_code"
           autoComplete="postal-code"
           value={formData["shipping_address.postal_code"]}
@@ -157,7 +171,7 @@ const ShippingAddress = ({
           data-testid="shipping-postal-code-input"
         />
         <Input
-          label="City"
+          label="Ciudad"
           name="shipping_address.city"
           autoComplete="address-level2"
           value={formData["shipping_address.city"]}
@@ -175,7 +189,7 @@ const ShippingAddress = ({
           data-testid="shipping-country-select"
         />
         <Input
-          label="State / Province"
+          label="Provincia"
           name="shipping_address.province"
           autoComplete="address-level1"
           value={formData["shipping_address.province"]}
@@ -188,7 +202,7 @@ const ShippingAddress = ({
           label="Email"
           name="email"
           type="email"
-          title="Enter a valid email address."
+          title="Introduce un email válido."
           autoComplete="email"
           value={formData.email}
           onChange={handleChange}
@@ -196,7 +210,7 @@ const ShippingAddress = ({
           data-testid="shipping-email-input"
         />
         <Input
-          label="Phone"
+          label="Teléfono"
           name="shipping_address.phone"
           autoComplete="tel"
           value={formData["shipping_address.phone"]}
