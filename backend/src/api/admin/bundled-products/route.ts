@@ -2,7 +2,7 @@ import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http"
-import { z } from "zod"
+import { z } from "@medusajs/framework/utils"
 import { AdminCreateProduct } from "@medusajs/medusa/api/admin/products/validators"
 import {
   createBundledProductWorkflow,
@@ -18,12 +18,12 @@ export const PostBundledProductsSchema = z.object({
       quantity: z.number(),
     })
   ),
-})
+}) as z.ZodObject<any, any>
 
-type PostBundledProductsSchema = z.infer<typeof PostBundledProductsSchema>
+export type PostBundledProductsType = z.infer<typeof PostBundledProductsSchema>
 
 export async function POST(
-  req: AuthenticatedMedusaRequest<PostBundledProductsSchema>,
+  req: AuthenticatedMedusaRequest<PostBundledProductsType>,
   res: MedusaResponse
 ) {
   const { result: bundledProduct } = await createBundledProductWorkflow(
