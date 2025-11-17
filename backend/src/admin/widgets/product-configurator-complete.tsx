@@ -1,17 +1,16 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
 import { useState, useEffect } from "react"
 
-type Material = { id: string; name: string; priceMultiplier: number }
-type Size = { label: string; width: number; height: number }
+type Material = { id: string; name: string; priceMultiplier: number; icon?: string }
+type Size = { label: string; width: number; height: number; priceMultiplier: number }
 type Quantity = { qty: number; basePrice: number }
 type Finish = { id: string; name: string }
+type Shape = { id: string; name: string; icon?: string }
 
 const ProductConfiguratorWidget = ({ data }: { data: any }) => {
   const product = data
   const [isCustom, setIsCustom] = useState(false)
-  const [category, setCategory] = useState("")
-  const [subcategory, setSubcategory] = useState("")
-  const [shapes, setShapes] = useState<string[]>([])
+  const [shapes, setShapes] = useState<Shape[]>([])
   const [materials, setMaterials] = useState<Material[]>([])
   const [sizes, setSizes] = useState<Size[]>([])
   const [quantities, setQuantities] = useState<Quantity[]>([])
@@ -37,8 +36,6 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
       }
 
       setIsCustom(product.metadata.product_type === "custom_sticker")
-      setCategory(product.metadata.category || "")
-      setSubcategory(product.metadata.subcategory || "")
       setShapes(parseField(product.metadata["config.shapes"]) || [])
       setMaterials(parseField(product.metadata["config.materials"]) || [])
       setSizes(parseField(product.metadata["config.sizes"]) || [])
@@ -51,56 +48,41 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
     }
   }, [product])
 
-  const allShapes = ["contorneado", "cuadrado", "circular", "esquinas_redondeadas"]
-
-  const categories = [
-    { value: "", label: "Seleccionar categoría..." },
-    { value: "pegatinas", label: "Pegatinas" },
-    { value: "etiquetas", label: "Etiquetas" },
-    { value: "vinilos", label: "Vinilos" },
-    { value: "otros", label: "Otros" },
+  const allShapes: Shape[] = [
+    { id: "contorneado", name: "Contorneado", icon: "🔷" },
+    { id: "cuadrado", name: "Cuadrado", icon: "⬜" },
+    { id: "circular", name: "Circular", icon: "⭕" },
+    { id: "esquinas_redondeadas", name: "Esquinas Redondeadas", icon: "▢" },
   ]
 
-  const subcategoriesByCategory: Record<string, Array<{ value: string; label: string }>> = {
-    pegatinas: [
-      { value: "", label: "Seleccionar subcategoría..." },
-      { value: "suelo", label: "Para el Suelo" },
-      { value: "pared", label: "Para la Pared" },
-      { value: "cristal", label: "Para Cristal" },
-      { value: "vehiculos", label: "Para Vehículos" },
-      { value: "general", label: "General" },
-    ],
-    etiquetas: [
-      { value: "", label: "Seleccionar subcategoría..." },
-      { value: "productos", label: "Para Productos" },
-      { value: "envases", label: "Para Envases" },
-      { value: "general", label: "General" },
-    ],
-    vinilos: [
-      { value: "", label: "Seleccionar subcategoría..." },
-      { value: "decorativos", label: "Decorativos" },
-      { value: "publicitarios", label: "Publicitarios" },
-      { value: "general", label: "General" },
-    ],
-    otros: [
-      { value: "", label: "Seleccionar subcategoría..." },
-      { value: "general", label: "General" },
-    ],
+  const toggleShape = (shapeId: string) => {
+    const shapeExists = shapes.find(s => s.id === shapeId)
+    if (shapeExists) {
+      setShapes(shapes.filter(s => s.id !== shapeId))
+    } else {
+      const shapeToAdd = allShapes.find(s => s.id === shapeId)
+      if (shapeToAdd) {
+        setShapes([...shapes, shapeToAdd])
+      }
+    }
   }
 
-  const availableSubcategories = category ? subcategoriesByCategory[category] || [] : []
-
-  const toggleShape = (shape: string) => {
-    setShapes(shapes.includes(shape) ? shapes.filter(s => s !== shape) : [...shapes, shape])
+  const addShape = () => {
+    setShapes([...shapes, { id: "", name: "", icon: "" }])
   }
 
-  const handleCategoryChange = (newCategory: string) => {
-    setCategory(newCategory)
-    setSubcategory("") // Reset subcategory
+  const updateShape = (index: number, field: keyof Shape, value: any) => {
+    const newShapes = [...shapes]
+    newShapes[index] = { ...newShapes[index], [field]: value }
+    setShapes(newShapes)
+  }
+
+  const removeShape = (index: number) => {
+    setShapes(shapes.filter((_, i) => i !== index))
   }
 
   const addMaterial = () => {
-    setMaterials([...materials, { id: "", name: "", priceMultiplier: 1.0 }])
+    setMaterials([...materials, { id: "", name: "", priceMultiplier: 1.0, icon: "" }])
   }
 
   const updateMaterial = (index: number, field: keyof Material, value: any) => {
@@ -114,7 +96,7 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
   }
 
   const addSize = () => {
-    setSizes([...sizes, { label: "", width: 0, height: 0 }])
+    setSizes([...sizes, { label: "", width: 0, height: 0, priceMultiplier: 1.0 }])
   }
 
   const updateSize = (index: number, field: keyof Size, value: any) => {
@@ -163,8 +145,6 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
       }
 
       if (isCustom) {
-        if (category) metadata["category"] = category
-        if (subcategory) metadata["subcategory"] = subcategory
         metadata["config.shapes"] = JSON.stringify(shapes)
         metadata["config.materials"] = JSON.stringify(materials)
         metadata["config.sizes"] = JSON.stringify(sizes)
