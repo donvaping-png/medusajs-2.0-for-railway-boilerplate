@@ -8,6 +8,7 @@ interface StickerConfiguratorProps {
   categorySlug: string
   productId?: string
   priceTable?: Array<{ qty: number; basePrice: number }>
+  productImages?: Array<{ url: string; alt?: string }>
   onAddToCart?: (config: any) => void
 }
 
@@ -16,6 +17,7 @@ export function StickerConfigurator({
   categorySlug,
   productId,
   priceTable,
+  productImages = [],
   onAddToCart,
 }: StickerConfiguratorProps) {
   const {
@@ -23,9 +25,7 @@ export function StickerConfigurator({
     updateField,
     updateSize,
     updateImage,
-    clearImage,
     currentPrice,
-    unitPrice,
     currentDimensions,
     validation,
   } = useStickerConfigurator({ subcategoryConfig, categorySlug })
@@ -77,37 +77,39 @@ export function StickerConfigurator({
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
-      {/* Imagen del producto - Izquierda */}
+      {/* Imágenes del producto - Izquierda */}
       <div className="lg:sticky lg:top-4 h-fit">
-        <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center relative overflow-hidden">
-          {config.image?.preview ? (
-            <>
+        {productImages && productImages.length > 0 ? (
+          <div className="space-y-4">
+            {/* Imagen principal */}
+            <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center relative overflow-hidden">
               <img
-                src={config.image.preview}
-                alt="Preview del diseño"
-                className="w-full h-full object-contain p-8"
+                src={productImages[0].url}
+                alt={productImages[0].alt || "Imagen del producto"}
+                className="w-full h-full object-contain p-4"
               />
-              <button
-                onClick={clearImage}
-                className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-                title="Eliminar imagen"
-              >
-                <svg
-                  className="w-5 h-5 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </>
-          ) : (
+            </div>
+
+            {/* Miniaturas */}
+            {productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {productImages.map((image, index) => (
+                  <button
+                    key={index}
+                    className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-primary transition-all"
+                  >
+                    <img
+                      src={image.url}
+                      alt={image.alt || `Imagen ${index + 1}`}
+                      className="w-full h-full object-contain p-2"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-gray-100 rounded-lg aspect-square flex items-center justify-center">
             <div className="text-center p-8">
               <svg
                 className="w-24 h-24 mx-auto text-gray-300 mb-4"
@@ -123,20 +125,11 @@ export function StickerConfigurator({
                 />
               </svg>
               <p className="text-gray-500 text-sm">
-                Vista previa de tu diseño
+                Sin imágenes disponibles
               </p>
             </div>
-          )}
-        </div>
-
-        {/* Indicador */}
-        <div className="flex justify-center gap-2 mt-4">
-          <div
-            className={`w-2 h-2 rounded-full ${
-              config.image ? "bg-primary" : "bg-gray-300"
-            }`}
-          />
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Configurador - Derecha */}
