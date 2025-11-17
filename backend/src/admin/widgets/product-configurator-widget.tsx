@@ -1,26 +1,17 @@
 import { defineWidgetConfig } from "@medusajs/admin-sdk"
-import { Container, Heading, Button, Input, Select, Checkbox, Label } from "@medusajs/ui"
 import { useState, useEffect } from "react"
 
 // Widget para configurar productos personalizables
 const ProductConfiguratorWidget = ({ data }: { data: any }) => {
   const product = data
-  const [config, setConfig] = useState({
-    productType: product.metadata?.product_type || "standard",
-    shapes: [],
-    materials: [],
-    sizes: [],
-    quantities: [],
-    finishes: [],
-    allowCustomSize: false,
-    minQuantity: 10,
-    maxWidth: null,
-    maxHeight: null,
-  })
+  const [isCustom, setIsCustom] = useState(false)
+  const [shapes, setShapes] = useState<string[]>([])
 
   // Parsear metadata existente
   useEffect(() => {
     if (product.metadata) {
+      setIsCustom(product.metadata.product_type === "custom_sticker")
+      
       const parseField = (field: any) => {
         if (!field) return null
         if (typeof field === "string") {
@@ -33,158 +24,231 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
         return field
       }
 
-      setConfig({
-        productType: product.metadata.product_type || "standard",
-        shapes: parseField(product.metadata["config.shapes"]) || [],
-        materials: parseField(product.metadata["config.materials"]) || [],
-        sizes: parseField(product.metadata["config.sizes"]) || [],
-        quantities: parseField(product.metadata["config.quantities"]) || [],
-        finishes: parseField(product.metadata["config.finishes"]) || [],
-        allowCustomSize: product.metadata["config.allowCustomSize"] === "true" || product.metadata["config.allowCustomSize"] === true,
-        minQuantity: parseInt(product.metadata["config.minQuantity"]) || 10,
-        maxWidth: parseInt(product.metadata["config.maxWidth"]) || null,
-        maxHeight: parseInt(product.metadata["config.maxHeight"]) || null,
-      })
+      const parsedShapes = parseField(product.metadata["config.shapes"])
+      if (Array.isArray(parsedShapes)) {
+        setShapes(parsedShapes)
+      }
     }
   }, [product])
 
-  const isCustomSticker = config.productType === "custom_sticker"
+  const allShapes = ["contorneado", "cuadrado", "circular", "esquinas_redondeadas"]
+
+  const toggleShape = (shape: string) => {
+    if (shapes.includes(shape)) {
+      setShapes(shapes.filter(s => s !== shape))
+    } else {
+      setShapes([...shapes, shape])
+    }
+  }
 
   return (
-    <Container className="p-6">
-      <Heading level="h2" className="mb-4">
-        Configurador de Producto
-      </Heading>
-
-      {/* Tipo de producto */}
-      <div className="mb-6">
-        <Label>Tipo de Producto</Label>
-        <Select
-          value={config.productType}
-          onValueChange={(value) => setConfig({ ...config, productType: value })}
-        >
-          <Select.Trigger>
-            <Select.Value />
-          </Select.Trigger>
-          <Select.Content>
-            <Select.Item value="standard">Producto Estándar</Select.Item>
-            <Select.Item value="custom_sticker">Pegatina Personalizable</Select.Item>
-          </Select.Content>
-        </Select>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h3 style={styles.title}>⚙️ Configurador de Producto</h3>
       </div>
 
-      {isCustomSticker && (
+      {/* Tipo de producto */}
+      <div style={styles.section}>
+        <label style={styles.label}>Tipo de Producto</label>
+        <select
+          value={isCustom ? "custom_sticker" : "standard"}
+          onChange={(e) => setIsCustom(e.target.value === "custom_sticker")}
+          style={styles.select}
+        >
+          <option value="standard">Producto Estándar</option>
+          <option value="custom_sticker">Pegatina Personalizable</option>
+        </select>
+      </div>
+
+      {isCustom && (
         <>
           {/* Formas */}
-          <div className="mb-6">
-            <Label>Formas Disponibles</Label>
-            <div className="text-sm text-gray-600 mb-2">
+          <div style={styles.section}>
+            <label style={styles.label}>Formas Disponibles</label>
+            <div style={styles.hint}>
               Selecciona las formas que estarán disponibles para este producto
             </div>
-            <div className="space-y-2">
-              {["contorneado", "cuadrado", "circular", "esquinas_redondeadas"].map((shape) => (
-                <div key={shape} className="flex items-center gap-2">
-                  <Checkbox
-                    checked={config.shapes.includes(shape)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
-                        setConfig({ ...config, shapes: [...config.shapes, shape] })
-                      } else {
-                        setConfig({ ...config, shapes: config.shapes.filter((s) => s !== shape) })
-                      }
-                    }}
+            <div style={styles.checkboxGroup}>
+              {allShapes.map((shape) => (
+                <label key={shape} style={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={shapes.includes(shape)}
+                    onChange={() => toggleShape(shape)}
+                    style={styles.checkbox}
                   />
-                  <span className="capitalize">{shape.replace(/_/g, " ")}</span>
-                </div>
+                  <span style={styles.checkboxText}>
+                    {shape.charAt(0).toUpperCase() + shape.slice(1).replace(/_/g, " ")}
+                  </span>
+                </label>
               ))}
             </div>
           </div>
 
-          {/* Información de configuración */}
-          <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              <strong>Nota:</strong> Para configurar materiales, tamaños, cantidades y precios,
-              edita el metadata del producto directamente o usa la API.
-            </p>
-            <p className="text-sm text-blue-800 mt-2">
-              Ver documentación: <code>METADATA_COMPLETO_ACTUALIZADO.md</code>
-            </p>
+          {/* Información */}
+          <div style={styles.infoBox}>
+            <div style={styles.infoTitle}>📝 Configuración Completa</div>
+            <div style={styles.infoText}>
+              Para configurar materiales, tamaños, cantidades y precios, edita el metadata del producto:
+            </div>
+            <ul style={styles.infoList}>
+              <li><code>config.materials</code> - Array de materiales</li>
+              <li><code>config.sizes</code> - Array de tamaños</li>
+              <li><code>config.quantities</code> - Array de cantidades y precios</li>
+              <li><code>config.finishes</code> - Array de acabados (opcional)</li>
+            </ul>
+            <div style={styles.infoText}>
+              Ver: <code>METADATA_COMPLETO_ACTUALIZADO.md</code>
+            </div>
           </div>
 
-          {/* Opciones adicionales */}
-          <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Checkbox
-                checked={config.allowCustomSize}
-                onCheckedChange={(checked) =>
-                  setConfig({ ...config, allowCustomSize: checked as boolean })
-                }
-              />
-              <Label>Permitir tamaño personalizado</Label>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Cantidad Mínima</Label>
-                <Input
-                  type="number"
-                  value={config.minQuantity}
-                  onChange={(e) =>
-                    setConfig({ ...config, minQuantity: parseInt(e.target.value) || 10 })
-                  }
-                />
+          {/* Valores actuales */}
+          {shapes.length > 0 && (
+            <div style={styles.currentConfig}>
+              <div style={styles.configLabel}>Formas seleccionadas:</div>
+              <div style={styles.configValue}>
+                {JSON.stringify(shapes)}
               </div>
-
-              {config.allowCustomSize && (
-                <>
-                  <div>
-                    <Label>Ancho Máximo (cm)</Label>
-                    <Input
-                      type="number"
-                      value={config.maxWidth || ""}
-                      onChange={(e) =>
-                        setConfig({ ...config, maxWidth: parseInt(e.target.value) || null })
-                      }
-                      placeholder="Sin límite"
-                    />
-                  </div>
-                  <div>
-                    <Label>Alto Máximo (cm)</Label>
-                    <Input
-                      type="number"
-                      value={config.maxHeight || ""}
-                      onChange={(e) =>
-                        setConfig({ ...config, maxHeight: parseInt(e.target.value) || null })
-                      }
-                      placeholder="Sin límite"
-                    />
-                  </div>
-                </>
-              )}
+              <div style={styles.hint}>
+                Copia este valor en el metadata: <code>config.shapes</code>
+              </div>
             </div>
-          </div>
-
-          {/* Botón para guardar */}
-          <Button
-            onClick={() => {
-              // Aquí iría la lógica para guardar en el metadata
-              console.log("Configuración a guardar:", config)
-              alert("Configuración guardada (implementar guardado real)")
-            }}
-          >
-            Guardar Configuración
-          </Button>
+          )}
         </>
       )}
 
-      {!isCustomSticker && (
-        <div className="text-gray-600 text-sm">
-          Este es un producto estándar. Cambia el tipo a "Pegatina Personalizable" para configurar
-          el configurador.
+      {!isCustom && (
+        <div style={styles.standardInfo}>
+          Este es un producto estándar. Cambia el tipo a "Pegatina Personalizable" para configurar el configurador.
         </div>
       )}
-    </Container>
+    </div>
   )
+}
+
+const styles = {
+  container: {
+    backgroundColor: "white",
+    border: "1px solid #e5e7eb",
+    borderRadius: "8px",
+    padding: "20px",
+    marginTop: "16px",
+  },
+  header: {
+    marginBottom: "16px",
+    paddingBottom: "12px",
+    borderBottom: "1px solid #e5e7eb",
+  },
+  title: {
+    fontSize: "16px",
+    fontWeight: "600" as const,
+    margin: 0,
+    color: "#111827",
+  },
+  section: {
+    marginBottom: "20px",
+  },
+  label: {
+    display: "block",
+    fontSize: "14px",
+    fontWeight: "500" as const,
+    marginBottom: "8px",
+    color: "#374151",
+  },
+  select: {
+    width: "100%",
+    padding: "8px 12px",
+    border: "1px solid #d1d5db",
+    borderRadius: "6px",
+    fontSize: "14px",
+    backgroundColor: "white",
+    color: "#111827",
+  },
+  hint: {
+    fontSize: "12px",
+    color: "#6b7280",
+    marginBottom: "8px",
+  },
+  checkboxGroup: {
+    display: "flex",
+    flexDirection: "column" as const,
+    gap: "8px",
+  },
+  checkboxLabel: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "8px",
+    border: "1px solid #e5e7eb",
+    borderRadius: "6px",
+    cursor: "pointer",
+  },
+  checkbox: {
+    width: "16px",
+    height: "16px",
+    cursor: "pointer",
+  },
+  checkboxText: {
+    fontSize: "14px",
+    color: "#374151",
+  },
+  infoBox: {
+    backgroundColor: "#f0f9ff",
+    border: "1px solid #bae6fd",
+    borderRadius: "6px",
+    padding: "12px",
+    marginBottom: "20px",
+  },
+  infoTitle: {
+    fontSize: "14px",
+    fontWeight: "600" as const,
+    color: "#0369a1",
+    marginBottom: "8px",
+  },
+  infoText: {
+    fontSize: "13px",
+    color: "#0c4a6e",
+    marginBottom: "8px",
+    lineHeight: "1.5",
+  },
+  infoList: {
+    margin: "8px 0",
+    paddingLeft: "20px",
+    fontSize: "13px",
+    color: "#0c4a6e",
+    lineHeight: "1.6",
+  },
+  currentConfig: {
+    backgroundColor: "#f9fafb",
+    border: "1px solid #e5e7eb",
+    borderRadius: "6px",
+    padding: "12px",
+    marginBottom: "20px",
+  },
+  configLabel: {
+    fontSize: "12px",
+    fontWeight: "500" as const,
+    color: "#6b7280",
+    marginBottom: "4px",
+  },
+  configValue: {
+    fontFamily: "monospace",
+    fontSize: "13px",
+    color: "#111827",
+    backgroundColor: "white",
+    padding: "8px",
+    borderRadius: "4px",
+    border: "1px solid #e5e7eb",
+    marginBottom: "8px",
+    overflowX: "auto" as const,
+  },
+  standardInfo: {
+    fontSize: "14px",
+    color: "#6b7280",
+    padding: "12px",
+    backgroundColor: "#f9fafb",
+    borderRadius: "6px",
+  },
 }
 
 export const config = defineWidgetConfig({
