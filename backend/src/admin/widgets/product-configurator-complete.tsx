@@ -9,6 +9,8 @@ type Finish = { id: string; name: string }
 const ProductConfiguratorWidget = ({ data }: { data: any }) => {
   const product = data
   const [isCustom, setIsCustom] = useState(false)
+  const [category, setCategory] = useState("")
+  const [subcategory, setSubcategory] = useState("")
   const [shapes, setShapes] = useState<string[]>([])
   const [materials, setMaterials] = useState<Material[]>([])
   const [sizes, setSizes] = useState<Size[]>([])
@@ -35,6 +37,8 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
       }
 
       setIsCustom(product.metadata.product_type === "custom_sticker")
+      setCategory(product.metadata.category || "")
+      setSubcategory(product.metadata.subcategory || "")
       setShapes(parseField(product.metadata["config.shapes"]) || [])
       setMaterials(parseField(product.metadata["config.materials"]) || [])
       setSizes(parseField(product.metadata["config.sizes"]) || [])
@@ -49,8 +53,50 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
 
   const allShapes = ["contorneado", "cuadrado", "circular", "esquinas_redondeadas"]
 
+  const categories = [
+    { value: "", label: "Seleccionar categoría..." },
+    { value: "pegatinas", label: "Pegatinas" },
+    { value: "etiquetas", label: "Etiquetas" },
+    { value: "vinilos", label: "Vinilos" },
+    { value: "otros", label: "Otros" },
+  ]
+
+  const subcategoriesByCategory: Record<string, Array<{ value: string; label: string }>> = {
+    pegatinas: [
+      { value: "", label: "Seleccionar subcategoría..." },
+      { value: "suelo", label: "Para el Suelo" },
+      { value: "pared", label: "Para la Pared" },
+      { value: "cristal", label: "Para Cristal" },
+      { value: "vehiculos", label: "Para Vehículos" },
+      { value: "general", label: "General" },
+    ],
+    etiquetas: [
+      { value: "", label: "Seleccionar subcategoría..." },
+      { value: "productos", label: "Para Productos" },
+      { value: "envases", label: "Para Envases" },
+      { value: "general", label: "General" },
+    ],
+    vinilos: [
+      { value: "", label: "Seleccionar subcategoría..." },
+      { value: "decorativos", label: "Decorativos" },
+      { value: "publicitarios", label: "Publicitarios" },
+      { value: "general", label: "General" },
+    ],
+    otros: [
+      { value: "", label: "Seleccionar subcategoría..." },
+      { value: "general", label: "General" },
+    ],
+  }
+
+  const availableSubcategories = category ? subcategoriesByCategory[category] || [] : []
+
   const toggleShape = (shape: string) => {
     setShapes(shapes.includes(shape) ? shapes.filter(s => s !== shape) : [...shapes, shape])
+  }
+
+  const handleCategoryChange = (newCategory: string) => {
+    setCategory(newCategory)
+    setSubcategory("") // Reset subcategory
   }
 
   const addMaterial = () => {
@@ -117,6 +163,8 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
       }
 
       if (isCustom) {
+        if (category) metadata["category"] = category
+        if (subcategory) metadata["subcategory"] = subcategory
         metadata["config.shapes"] = JSON.stringify(shapes)
         metadata["config.materials"] = JSON.stringify(materials)
         metadata["config.sizes"] = JSON.stringify(sizes)
@@ -168,6 +216,28 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
 
       {isCustom && (
         <>
+          {/* Categoría */}
+          <div style={styles.section}>
+            <label style={styles.label}>Categoría</label>
+            <select value={category} onChange={(e) => handleCategoryChange(e.target.value)} style={styles.select}>
+              {categories.map((cat) => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subcategoría */}
+          {category && (
+            <div style={styles.section}>
+              <label style={styles.label}>Subcategoría</label>
+              <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} style={styles.select}>
+                {availableSubcategories.map((subcat) => (
+                  <option key={subcat.value} value={subcat.value}>{subcat.label}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Formas */}
           <div style={styles.section}>
             <label style={styles.label}>Formas Disponibles</label>
