@@ -1,0 +1,104 @@
+{
+  "ejemplo_configuracion_completa": {
+    "productId": "custom-sticker-pegatinas-holograficas",
+    "quantity": 1,
+    "unitPrice": 45.5,
+    "metadata": {
+      "configurationType": "custom_sticker",
+      "category": "pegatinas",
+      "subcategory": "holograficas",
+      "type": "hojas",
+      "shape": "contorneada",
+      "material": "holografico",
+      "finish": "lustroso",
+      "width": 10,
+      "height": 10,
+      "customQuantity": 100,
+      "imageUrl": "https://tu-storage.com/uploads/diseno-cliente-123.png"
+    }
+  },
+  "ejemplo_con_tamano_personalizado": {
+    "productId": "custom-sticker-pegatinas-broqueladas",
+    "quantity": 1,
+    "unitPrice": 89.25,
+    "metadata": {
+      "configurationType": "custom_sticker",
+      "category": "pegatinas",
+      "subcategory": "broqueladas",
+      "type": "etiquetas_colgantes",
+      "shape": "circular",
+      "material": "vinilo_broquelado",
+      "finish": "satinado",
+      "width": 15.5,
+      "height": 12.3,
+      "customQuantity": 250,
+      "imageUrl": "https://tu-storage.com/uploads/logo-empresa-456.png"
+    }
+  },
+  "ejemplo_etiquetas_metalicas": {
+    "productId": "custom-sticker-etiquetas-metalicas",
+    "quantity": 1,
+    "unitPrice": 125.0,
+    "metadata": {
+      "configurationType": "custom_sticker",
+      "category": "etiquetas",
+      "subcategory": "metalicas",
+      "type": "etiqueta_marca",
+      "shape": "esquinas_redondeadas",
+      "material": "metalizado_oro",
+      "finish": "brillante",
+      "width": 5,
+      "height": 5,
+      "customQuantity": 500,
+      "imageUrl": "https://tu-storage.com/uploads/etiqueta-premium-789.png"
+    }
+  },
+  "notas": {
+    "productId": "ID del producto/variante en Medusa que corresponde a esta subcategoría",
+    "quantity": "Siempre 1 porque la cantidad real está en metadata.customQuantity",
+    "unitPrice": "Precio total calculado para toda la configuración (no precio unitario por pegatina)",
+    "metadata": {
+      "configurationType": "Siempre 'custom_sticker' para identificar este tipo de producto",
+      "category": "Slug de la categoría principal (pegatinas o etiquetas)",
+      "subcategory": "Slug de la subcategoría específica",
+      "type": "Tipo de producto seleccionado",
+      "shape": "Forma seleccionada",
+      "material": "Material seleccionado (importante para producción)",
+      "finish": "Acabado seleccionado",
+      "width": "Ancho en centímetros",
+      "height": "Alto en centímetros",
+      "customQuantity": "Cantidad real de pegatinas que el cliente quiere",
+      "imageUrl": "URL de la imagen subida por el cliente (opcional)"
+    }
+  },
+  "como_usar_en_medusa": {
+    "paso_1": "Crear un producto base 'Pegatina Personalizada' en Medusa Admin",
+    "paso_2": "Crear variantes para cada subcategoría con SKUs únicos",
+    "paso_3": "Al recibir el pedido, leer metadata para obtener la configuración",
+    "paso_4": "Usar la configuración para generar el archivo de producción",
+    "paso_5": "Descargar la imagen desde imageUrl para impresión"
+  },
+  "ejemplo_variantes_medusa": [
+    {
+      "sku": "CUSTOM-STICKER-PEGATINAS-HOLOGRAFICAS",
+      "title": "Pegatina Holográfica Personalizada",
+      "inventory_quantity": 9999,
+      "manage_inventory": false,
+      "allow_backorder": true
+    },
+    {
+      "sku": "CUSTOM-STICKER-PEGATINAS-BROQUELADAS",
+      "title": "Pegatina Broquelada Personalizada",
+      "inventory_quantity": 9999,
+      "manage_inventory": false,
+      "allow_backorder": true
+    },
+    {
+      "sku": "CUSTOM-STICKER-ETIQUETAS-METALICAS",
+      "title": "Etiqueta Metálica Personalizada",
+      "inventory_quantity": 9999,
+      "manage_inventory": false,
+      "allow_backorder": true
+    }
+  ]
+}

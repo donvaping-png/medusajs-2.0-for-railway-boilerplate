@@ -1,0 +1,188 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                    CONFIGURADOR DE PEGATINAS - ESTRUCTURA                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+📁 ARCHIVOS PRINCIPALES
+═══════════════════════════════════════════════════════════════════════════════
+
+src/
+├── config/
+│   └── sticker-categories.ts          ⚙️  Configuración central de categorías
+│
+├── types/
+│   └── sticker-configurator.ts        📝 Tipos TypeScript
+│
+├── hooks/
+│   └── useStickerConfigurator.ts      🎣 Hook principal del configurador
+│
+├── components/organisms/
+│   └── StickerConfigurator/
+│       ├── StickerConfigurator.tsx    🎨 Componente principal
+│       ├── ConfiguratorSection.tsx    📦 Sección reutilizable
+│       ├── ConfiguratorSummary.tsx    💰 Resumen y precio
+│       └── index.ts                   📤 Exports
+│
+├── app/[locale]/(main)/
+│   ├── pegatinas/
+│   │   ├── page.tsx                   📄 Listado subcategorías
+│   │   └── [subcategory]/
+│   │       └── page.tsx               🎯 Configurador de pegatinas
+│   │
+│   └── etiquetas/
+│       ├── page.tsx                   📄 Listado subcategorías
+│       └── [subcategory]/
+│           └── page.tsx               🎯 Configurador de etiquetas
+│
+└── lib/helpers/
+    ├── sticker-cart.ts                🛒 Funciones de carrito
+    └── sticker-pricing.ts             💵 Cálculo de precios
+
+
+📚 DOCUMENTACIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+storefront/
+├── CONFIGURADOR_README.md             📖 Guía principal (EMPIEZA AQUÍ)
+├── CONFIGURADOR_PEGATINAS.md          📘 Documentación técnica completa
+├── INTEGRACION_MEDUSA_CONFIGURADOR.md 🔌 Guía de integración con Medusa
+├── CHECKLIST_INTEGRACION.md           ✅ Checklist paso a paso
+├── EJEMPLOS_USO_CONFIGURADOR.md       💡 Ejemplos prácticos
+└── EJEMPLO_PAYLOAD_CONFIGURADOR.json  📋 Ejemplos de datos
+
+
+🗺️ RUTAS DISPONIBLES
+═══════════════════════════════════════════════════════════════════════════════
+
+PEGATINAS:
+  /[locale]/pegatinas                           → Listado
+  /[locale]/pegatinas/holograficas             → Configurador ✨
+  /[locale]/pegatinas/broqueladas              → Configurador 🎨
+  /[locale]/pegatinas/transfer                 → Configurador 📋
+  /[locale]/pegatinas/hojas                    → Configurador 📄
+  /[locale]/pegatinas/paquetes                 → Configurador 📦
+  /[locale]/pegatinas/servicio-impresado       → Configurador 🖨️
+  /[locale]/pegatinas/etiquetas-colgantes      → Configurador 🏷️
+
+ETIQUETAS:
+  /[locale]/etiquetas                           → Listado
+  /[locale]/etiquetas/metalicas                → Configurador 🥇
+  /[locale]/etiquetas/nino-blanco              → Configurador ⚪
+  /[locale]/etiquetas/alfa-verdes              → Configurador 🌿
+
+
+🎯 FLUJO DEL USUARIO
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Usuario navega a /pegatinas o /etiquetas
+   ↓
+2. Ve listado de subcategorías con descripciones
+   ↓
+3. Selecciona una subcategoría (ej: holograficas)
+   ↓
+4. Llega al configurador con 7 secciones:
+   
+   ┌─────────────────────────────────────────────────────────────┐
+   │ 1️⃣  TIPO          → Hojas, Etiquetas Colgantes, Nojas      │
+   │ 2️⃣  FORMA         → Contorneada, Cuadrada, Circular, etc.  │
+   │ 3️⃣  MATERIAL      → Holográfico, Vinilo, Metalizado, etc.  │
+   │ 4️⃣  ACABADO       → Lustroso (brillante) o Satinado (mate) │
+   │ 5️⃣  TAMAÑO        → Predefinido o Personalizado            │
+   │ 6️⃣  CANTIDAD      → Con descuentos por volumen             │
+   │ 7️⃣  IMAGEN        → Subir diseño (JPG/PNG)                 │
+   └─────────────────────────────────────────────────────────────┘
+   
+   ↓
+5. Ve resumen en tiempo real con precio calculado
+   ↓
+6. Hace clic en "Añadir al Carrito"
+   ↓
+7. Producto se añade al carrito con toda la configuración
+
+
+💰 SISTEMA DE PRECIOS
+═══════════════════════════════════════════════════════════════════════════════
+
+Fórmula: (Ancho × Alto × €0.50 × Multiplicador Material) × Cantidad
+
+Multiplicadores de Material:
+  • Holográfico:        1.5x
+  • Broquelado:         1.3x
+  • Transfer:           1.2x
+  • Metalizado Plata:   1.6x
+  • Metalizado Oro:     1.7x
+
+Descuentos por Volumen:
+  • 25+ unidades:       5% descuento
+  • 50+ unidades:       10% descuento
+  • 100+ unidades:      15% descuento
+  • 250+ unidades:      20% descuento
+  • 500+ unidades:      25% descuento
+  • 1000+ unidades:     30% descuento
+
+
+🔌 INTEGRACIÓN PENDIENTE
+═══════════════════════════════════════════════════════════════════════════════
+
+BACKEND (3 endpoints):
+  ✅ POST /api/custom-stickers/upload           → Subir imagen
+  ✅ POST /api/custom-stickers/calculate-price  → Calcular precio
+  ✅ POST /api/cart/line-items                  → Añadir al carrito
+
+FRONTEND (3 funciones):
+  ✅ uploadStickerImage()      en sticker-cart.ts
+  ✅ calculatePrice()           en useStickerConfigurator.ts
+  ✅ addCustomStickerToCart()   en sticker-cart.ts
+
+
+📊 EJEMPLO DE PAYLOAD
+═══════════════════════════════════════════════════════════════════════════════
+
+{
+  "productId": "custom-sticker-pegatinas-holograficas",
+  "quantity": 1,
+  "unitPrice": 45.50,
+  "metadata": {
+    "configurationType": "custom_sticker",
+    "category": "pegatinas",
+    "subcategory": "holograficas",
+    "type": "hojas",
+    "shape": "contorneada",
+    "material": "holografico",
+    "finish": "lustroso",
+    "width": 10,
+    "height": 10,
+    "customQuantity": 100,
+    "imageUrl": "https://storage.com/design.png"
+  }
+}
+
+
+✨ CARACTERÍSTICAS
+═══════════════════════════════════════════════════════════════════════════════
+
+✅ Totalmente tipado con TypeScript
+✅ Diseño responsive (móvil + desktop)
+✅ Validación en tiempo real
+✅ Cálculo de precios automático
+✅ Descuentos por volumen
+✅ Subida de imágenes con preview
+✅ Configuración centralizada
+✅ Fácil de extender
+✅ Preparado para producción
+✅ Documentación completa
+
+
+🚀 PRÓXIMOS PASOS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Lee CONFIGURADOR_README.md
+2. Revisa INTEGRACION_MEDUSA_CONFIGURADOR.md
+3. Sigue CHECKLIST_INTEGRACION.md
+4. Implementa los 3 endpoints en el backend
+5. Conecta las 3 funciones en el frontend
+6. ¡Listo para producción! 🎉
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                          ¡CONFIGURADOR LISTO! 🎨🚀
+═══════════════════════════════════════════════════════════════════════════════
