@@ -201,9 +201,14 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
             <label style={styles.label}>Formas Disponibles</label>
             <div style={styles.checkboxGroup}>
               {allShapes.map((shape) => (
-                <label key={shape} style={styles.checkboxLabel}>
-                  <input type="checkbox" checked={shapes.includes(shape)} onChange={() => toggleShape(shape)} style={styles.checkbox} />
-                  <span>{shape.charAt(0).toUpperCase() + shape.slice(1).replace(/_/g, " ")}</span>
+                <label key={shape.id} style={styles.checkboxLabel}>
+                  <input 
+                    type="checkbox" 
+                    checked={shapes.some(s => s.id === shape.id)} 
+                    onChange={() => toggleShape(shape.id)} 
+                    style={styles.checkbox} 
+                  />
+                  <span>{shape.icon} {shape.name}</span>
                 </label>
               ))}
             </div>
