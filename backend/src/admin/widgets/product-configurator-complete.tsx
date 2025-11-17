@@ -196,28 +196,6 @@ const ProductConfiguratorWidget = ({ data }: { data: any }) => {
 
       {isCustom && (
         <>
-          {/* Categoría */}
-          <div style={styles.section}>
-            <label style={styles.label}>Categoría</label>
-            <select value={category} onChange={(e) => handleCategoryChange(e.target.value)} style={styles.select}>
-              {categories.map((cat) => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Subcategoría */}
-          {category && (
-            <div style={styles.section}>
-              <label style={styles.label}>Subcategoría</label>
-              <select value={subcategory} onChange={(e) => setSubcategory(e.target.value)} style={styles.select}>
-                {availableSubcategories.map((subcat) => (
-                  <option key={subcat.value} value={subcat.value}>{subcat.label}</option>
-                ))}
-              </select>
-            </div>
-          )}
-
           {/* Formas */}
           <div style={styles.section}>
             <label style={styles.label}>Formas Disponibles</label>
